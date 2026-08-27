@@ -516,10 +516,13 @@ gens:[
   const t=RC(T);
   return Q('「'+t[0]+'」は「'+t[1]+'」であるための（　）である。',t[2],
    ['必要条件','十分条件','必要十分条件','どちらでもない'].filter(v=>v!==t[2]),t[3]);},
- function(){const nA=R(12,30),nB=R(12,30),nAB=R(3,10),nU=nA+nB-nAB;
-  return Q('40人のクラスで、A を好きな人が '+nA+'人、B を好きな人が '+nB+'人、両方好きな人が '+nAB+'人。<br>A または B を好きな人は何人？',
+ function(){const N=40;
+  // 先に「AまたはB」の人数を決めてから内訳を作る（合計がクラス人数を超えないようにする）
+  const nU=R(26,N-2), nAB=R(4,10);
+  const nA=R(nAB+4,nU-4), nB=nU+nAB-nA, none=N-nU;
+  return Q(N+'人のクラスで、A を好きな人が '+nA+'人、B を好きな人が '+nB+'人、両方好きな人が '+nAB+'人。<br>A または B を好きな人は何人？',
    nU+'人',[(nA+nB)+'人',(nU-nAB)+'人',(nA+nB+nAB)+'人'],
-   'n(A∪B) = n(A) + n(B) − n(A∩B) = '+nA+' + '+nB+' − '+nAB+' = '+nU+'。重なりを1回引く。');}
+   'n(A∪B) = n(A) + n(B) − n(A∩B) = '+nA+' + '+nB+' − '+nAB+' = '+nU+'。両方好きな人を2回数えているので1回だけ引く。残りの '+none+' 人はどちらも好きではない。');}
 ]});
 
 UNITS.push({k:'I',n:'2次関数',s:'平方完成・最大最小・2次方程式と不等式',boss:'∪',
@@ -760,7 +763,7 @@ gens:[
   return Q('△ABC の重心を G、辺 BC の中点を M とする。中線 AM の長さが '+m+' のとき AG の長さは？',
    String(m*2/3),[String(m/3),String(m/2),String(m*3/2)],
    '重心は中線を頂点から 2:1 に内分する。AG : GM = 2 : 1 なので AG = '+m+' × %f{2}{3} = '+(m*2/3)+'。');},
- function(){const c=R(3,9),b=R(3,9),bc=(c+b)*R(1,3);
+ function(){const c=R(3,9),b=R(3,9),bc=R(Math.abs(b-c)+1,b+c-1);  // 三角形の成立条件を満たす BC
   const bd=bc*c/(b+c);
   return Q('△ABC で AB = '+c+', AC = '+b+', BC = '+bc+'。∠A の二等分線と BC の交点を D とするとき BD は？',
    (Number.isInteger(bd)?String(bd):frac(bc*c,b+c)),[frac(bc*b,b+c),String(bc/2),frac(bc,c)],
@@ -769,7 +772,9 @@ gens:[
   return Q('円 O で、弧 AB に対する中心角が '+cen+'° のとき、円周角 ∠APB は？',
    (cen/2)+'°',[cen+'°',(cen*2)+'°',(180-cen)+'°'],
    '円周角は中心角の半分。'+cen+'° ÷ 2 = '+(cen/2)+'°。同じ弧を見る円周角はどこにとっても等しい。');},
- function(){const pa=R(2,6),pb=R(7,14),pc=R(2,7);const pd=pa*pb/pc;
+ function(){const pa=R(2,6),pb=R(7,14);
+  const pc=R(2,Math.min(7,Math.floor(Math.sqrt(pa*pb))));  // PC ≦ PD となるように
+  const pd=pa*pb/pc;
   return Q('点 P を通る2直線が円と交わる。PA = '+pa+', PB = '+pb+', PC = '+pc+' のとき PD は？',
    (Number.isInteger(pd)?String(pd):frac(pa*pb,pc)),[String(pa*pb),frac(pc,pa*pb),String(pa+pb-pc)],
    '方べきの定理 PA·PB = PC·PD より PD = %f{'+pa+'×'+pb+'}{'+pc+'} = '+(Number.isInteger(pd)?pd:frac(pa*pb,pc))+'。');},
